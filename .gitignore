@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+*.pyc
+.env
+log_chat.csv
+hasil_evaluasi.csv
+log_perbandingan.csv

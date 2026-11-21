@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HaluToba - Perbandingan Halusinasi LLM</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--danau:#0B3340;--danau2:#0F4A5C;--kabut:#EEF4F5;--jingga:#E4572E;--pinus:#2E6B4F;--emas:#E9B44C;--teks:#12303A;--abu:#5F7480}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--kabut);color:var(--teks);font-family:'Nunito Sans',sans-serif}
+h1,h2,h3{font-family:Outfit,sans-serif;margin:0}
+.nav{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:26px;padding:14px 48px;background:rgba(11,51,64,.92);backdrop-filter:blur(8px);color:#fff}
+.logo{display:flex;align-items:center;gap:10px;font:800 21px Outfit;margin-right:auto}
+.nav a{color:#CFE3E8;text-decoration:none;font-weight:600}
+.nav a:hover{color:#fff}
+.nav .cta{background:var(--jingga);color:#fff;padding:9px 18px;border-radius:99px}
+.hero{position:relative;overflow:hidden;color:#fff;padding:78px 48px 150px;background:radial-gradient(circle at 80% 20%,#1B6379 0,transparent 45%),repeating-radial-gradient(circle at 85% 130%,#0B3340 0 26px,#0F4A5C 26px 28px)}
+.hero-isi{position:relative;max-width:900px;z-index:2}
+.pil{display:inline-block;background:rgba(233,180,76,.18);color:var(--emas);padding:6px 14px;border-radius:99px;font-weight:700;font-size:14px;margin-bottom:18px}
+.hero h1{font-size:clamp(34px,5.5vw,62px);line-height:1.05;font-weight:800;max-width:800px}
+.hero h1 em{font-style:normal;color:var(--emas)}
+.hero p.sub{font-size:18px;color:#BFD6DB;max-width:640px;margin:18px 0 28px}
+.kotak{display:flex;gap:10px;background:#fff;padding:8px;border-radius:16px;max-width:820px;box-shadow:0 18px 40px rgba(0,0,0,.25)}
+.kotak input{flex:1;border:0;padding:14px 16px;font:inherit;font-size:17px;border-radius:10px;outline:none;color:var(--teks)}
+.kotak button{border:0;background:var(--jingga);color:#fff;padding:0 30px;border-radius:12px;font:700 17px 'Nunito Sans';cursor:pointer}
+.kotak button:disabled{opacity:.55;cursor:wait}
+.chips{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:#BFD6DB;font-size:14.5px}
+.chips button{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;padding:6px 14px;border-radius:99px;cursor:pointer;font:inherit;font-size:14px}
+.chips button:hover{background:rgba(255,255,255,.22)}
+#status{margin-top:14px;color:var(--emas);font-weight:600;min-height:22px}
+.gelombang{position:absolute;left:0;bottom:-1px;width:100%;overflow:hidden;height:110px;z-index:1}
+.gelombang svg{position:absolute;bottom:0;width:200%;height:100%;animation:geser 14s linear infinite}
+.gelombang svg:nth-child(1){opacity:.35;animation-duration:22s}
+.gelombang svg:nth-child(2){opacity:.6;animation-duration:17s;animation-direction:reverse}
+@keyframes geser{to{transform:translateX(-50%)}}
+.statistik{max-width:1100px;margin:-70px auto 0;padding:0 48px;position:relative;z-index:3;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.stat{background:#fff;border-radius:16px;padding:18px 20px;box-shadow:0 10px 28px rgba(11,51,64,.12)}
+.stat b{display:block;font:800 28px Outfit;color:var(--danau2)}
+.stat span{color:var(--abu);font-size:14px}
+section{max-width:1100px;margin:0 auto;padding:56px 48px 0}
+section h2{font-size:30px;margin-bottom:6px}
+section .lead{color:var(--abu);margin:0 0 24px}
+#hasil{display:none}
+.acuan{background:var(--pinus);color:#fff;padding:18px 24px;border-radius:14px;margin-bottom:22px;border-left:8px solid var(--emas)}
+.acuan.kosong{background:#B9791F}
+.acuan small{display:block;margin-top:6px;opacity:.9}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.kartu{background:#fff;border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:14px;min-height:250px;border-top:7px solid var(--w);box-shadow:0 8px 24px rgba(11,51,64,.08);animation:naik .5s ease both}
+@keyframes naik{from{opacity:0;transform:translateY(14px)}}
+.kepala{display:flex;align-items:center;gap:12px}
+.inisial{width:44px;height:44px;border-radius:50%;background:var(--w);color:#fff;display:grid;place-items:center;font:800 19px Outfit}
+.kepala h3{flex:1;font-size:19px}
+.lencana{background:var(--emas);color:#3A2A00;font-size:12.5px;font-weight:700;padding:4px 11px;border-radius:99px}
+.jawab{flex:1;font-size:16px;line-height:1.6;white-space:pre-wrap}
+.tunggu{color:var(--abu);font-style:italic;position:relative;padding-left:30px}
+.tunggu::before{content:"";position:absolute;left:0;top:3px;width:16px;height:16px;border:3px solid #D5E2E5;border-top-color:var(--w);border-radius:50%;animation:putar 1s linear infinite}
+@keyframes putar{to{transform:rotate(360deg)}}
+.galat{color:#B3261E}
+.skorbaris{display:flex;align-items:center;gap:16px}
+.cincin{position:relative;width:84px;height:84px;flex:none}
+.cincin svg{transform:rotate(-90deg)}
+.cincin circle{fill:none;stroke-width:8;stroke-linecap:round}
+.cincin .bg{stroke:#E4ECEE}
+.cincin .fg{stroke:var(--w);transition:stroke-dasharray 1s ease}
+.cincin span{position:absolute;inset:0;display:grid;place-items:center;font:800 17px Outfit}
+.skorbaris .ket{color:var(--abu);font-size:14px;line-height:1.5}
+.meta{font-size:13.5px;color:var(--abu)}
+.peringkat{margin-top:24px;background:#fff;border-radius:18px;padding:24px;box-shadow:0 8px 24px rgba(11,51,64,.08)}
+.peringkat h3{font-size:21px;margin-bottom:14px}
+.baris{display:grid;grid-template-columns:34px 200px 1fr 60px;gap:12px;align-items:center;margin:11px 0}
+.no{width:30px;height:30px;border-radius:50%;background:var(--danau2);color:#fff;display:grid;place-items:center;font:700 14px Outfit}
+.baris:first-of-type .no{background:var(--emas);color:#3A2A00}
+.bar{height:12px;background:#E4ECEE;border-radius:9px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--w);transition:width 1s ease}
+.catatan{margin-top:14px;padding:12px 16px;background:#FFF4E5;border-radius:10px;color:#6B4A12;font-size:14.5px}
+.langkah{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.lk{background:#fff;border-radius:16px;padding:20px;position:relative}
+.lk .n{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:12px;background:var(--danau);color:var(--emas);font:800 18px Outfit;margin-bottom:10px}
+.lk h3{font-size:17px;margin-bottom:6px}
+.lk p{margin:0;color:var(--abu);font-size:14.5px;line-height:1.55}
+.tentang{background:var(--danau);color:#fff;border-radius:20px;padding:28px 32px;display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.tentang h3{font-size:20px;margin-bottom:8px;color:var(--emas)}
+.tentang p{margin:0;color:#CFE3E8;line-height:1.6}
+footer{margin-top:56px;padding:26px 48px;background:var(--danau);color:#9CB8BF;text-align:center;font-size:14px}
+@media(max-width:860px){.nav{padding:12px 20px;gap:14px}.nav a:not(.cta){display:none}.hero{padding:48px 20px 130px}.statistik{grid-template-columns:1fr 1fr;padding:0 20px}section{padding:44px 20px 0}.grid,.tentang{grid-template-columns:1fr}.langkah{grid-template-columns:1fr 1fr}.baris{grid-template-columns:30px 1fr 56px}.baris .bar{grid-column:1/-1;grid-row:2}.kotak{flex-direction:column}.kotak button{padding:14px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="logo"><svg width="30" height="30" viewBox="0 0 32 32"><path d="M2 26 L12 8 L18 18 L22 12 L30 26 Z" fill="#E9B44C"/><path d="M2 28 Q9 24 16 28 T30 28" stroke="#fff" stroke-width="2" fill="none"/></svg>HaluToba</div>
+  <a href="#beranda">Beranda</a><a href="#hasil-anchor">Bandingkan</a><a href="#cara">Cara kerja</a><a href="#tentang">Tentang</a>
+  <a class="cta" href="#beranda" onclick="document.getElementById('q').focus()">Mulai bertanya</a>
+</nav>
+
+<header class="hero" id="beranda">
+  <div class="hero-isi">
+    <span class="pil">Penelitian halusinasi LLM · Kabupaten Toba</span>
+    <h1>Seberapa <em>benar</em> jawaban AI tentang wisata Toba?</h1>
+    <p class="sub">Empat model bahasa menjawab pertanyaan yang sama, lalu setiap jawaban dibandingkan dengan ground truth dari dataset penelitian.</p>
+    <div class="kotak">
+      <input id="q" placeholder="Ketik pertanyaan wisata, misalnya: Di desa dan kecamatan mana Pantai Lumban Bulbul berada?">
+      <button id="tombol" onclick="bandingkan()">Bandingkan</button>
+    </div>
+    <div class="chips">Coba:
+      <button onclick="contoh('Di desa dan kecamatan mana Pantai Lumban Bulbul berada?')">Lokasi Lumban Bulbul</button>
+      <button onclick="contoh('Berapa kisaran biaya tiket masuk dan parkir kendaraan di Pantai Lumban Bulbul?')">Tiket Lumban Bulbul</button>
+    </div>
+    <div id="status"></div>
+  </div>
+  <div class="gelombang">
+    <svg viewBox="0 0 2880 120" preserveAspectRatio="none"><path fill="#EEF4F5" d="M0,60 C240,110 480,10 720,60 C960,110 1200,10 1440,60 C1680,110 1920,10 2160,60 C2400,110 2640,10 2880,60 L2880,120 L0,120Z"/></svg>
+    <svg viewBox="0 0 2880 120" preserveAspectRatio="none"><path fill="#EEF4F5" d="M0,80 C300,30 540,110 720,80 C980,40 1200,110 1440,80 C1740,30 1980,110 2160,80 C2420,40 2640,110 2880,80 L2880,120 L0,120Z"/></svg>
+  </div>
+</header>
+
+<div class="statistik">
+  <div class="stat"><b>4</b><span>model bahasa diuji</span></div>
+  <div class="stat"><b>0,2</b><span>suhu sama untuk semua model</span></div>
+  <div class="stat"><b>Dataset</b><span>ground truth dari pertanyaan.csv</span></div>
+  <div class="stat"><b>Cosine</b><span>skor kemiripan makna</span></div>
+</div>
+
+<section id="hasil">
+  <div id="hasil-anchor"></div>
+  <h2>Hasil perbandingan</h2>
+  <p class="lead">Jawaban muncul satu per satu begitu tiap model selesai.</p>
+  <div class="acuan" id="acuan"></div>
+  <div class="grid" id="grid"></div>
+  <div class="peringkat" id="peringkat" style="display:none"></div>
+</section>
+
+<section id="cara">
+  <h2>Cara kerja</h2>
+  <p class="lead">Dari pertanyaan sampai skor, ada empat langkah.</p>
+  <div class="langkah">
+    <div class="lk"><div class="n">1</div><h3>Pertanyaan</h3><p>Pengguna mengetik pertanyaan wisata Kabupaten Toba.</p></div>
+    <div class="lk"><div class="n">2</div><h3>Ground truth</h3><p>Sistem mencari jawaban benar yang paling cocok di dataset.</p></div>
+    <div class="lk"><div class="n">3</div><h3>Empat model</h3><p>Llama, Qwen, Mistral, dan Gemma menjawab dengan parameter yang sama.</p></div>
+    <div class="lk"><div class="n">4</div><h3>Skor</h3><p>Setiap jawaban dihitung kemiripan maknanya dengan ground truth.</p></div>
+  </div>
+</section>
+
+<section id="tentang">
+  <div class="tentang">
+    <div><h3>Tentang penelitian</h3><p>HaluToba membandingkan tingkat halusinasi empat LLM open-weight pada informasi wisata lokal, dengan membedakan destinasi berdokumentasi tinggi dan rendah.</p></div>
+    <div><h3>Membaca skor</h3><p>Skor cosine mengukur kemiripan makna, bukan kebenaran fakta. Jawaban yang keliru masih bisa berskor menengah, sehingga verifikasi klaim tetap diperlukan.</p></div>
+  </div>
+</section>
+
+<footer>HaluToba · Tugas Akhir · Perbandingan halusinasi empat LLM pada informasi wisata Kabupaten Toba</footer>
+
+<script>
+const WARNA = ['#1F5FAE', '#6B4FA3', '#C77A0A', '#2E7D5B'];
+const $ = s => document.querySelector(s);
+const esc = t => String(t).replace(/[&<>]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;'}[c]));
+const tebal = t => esc(t).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+const KELILING = 2 * Math.PI * 34;
+
+async function post(url, body) {
+  const r = await fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+  return r.json();
+}
+function contoh(t) { $('#q').value = t; bandingkan(); }
+
+function cincin(skor) {
+  const d = (Math.max(0, skor) * KELILING).toFixed(1);
+  return `<div class="cincin"><svg viewBox="0 0 80 80"><circle class="bg" cx="40" cy="40" r="34"/><circle class="fg" cx="40" cy="40" r="34" style="stroke-dasharray:0 ${KELILING}" data-d="${d}"/></svg><span>${skor.toFixed(3)}</span></div>`;
+}
+
+function isiKartu(i, r) {
+  const k = $('#k' + i), j = k.querySelector('.jawab');
+  j.classList.remove('tunggu');
+  if (!r.jawaban) { j.classList.add('galat'); j.textContent = r.error || 'Model tidak menjawab.'; }
+  else { j.innerHTML = tebal(r.jawaban); }
+  const s = (r.skor == null)
+    ? '<div class="meta">Skor tidak dihitung karena pertanyaan tidak ada di dataset.</div>'
+    : `<div class="skorbaris">${cincin(r.skor)}<div class="ket">Cosine similarity<br>terhadap ground truth</div></div>`;
+  k.insertAdjacentHTML('beforeend', s + `<div class="meta">Waktu menjawab: ${r.detik} detik</div>`);
+  const fg = k.querySelector('.fg');
+  if (fg) setTimeout(() => fg.style.strokeDasharray = fg.dataset.d + ' ' + KELILING, 50);
+}
+
+async function bandingkan() {
+  const q = $('#q').value.trim();
+  if (!q) return;
+  const tombol = $('#tombol'), st = $('#status');
+  tombol.disabled = true; tombol.textContent = 'Memproses...';
+  $('#grid').innerHTML = ''; $('#peringkat').style.display = 'none';
+  $('#hasil').style.display = 'block';
+  document.getElementById('hasil').scrollIntoView({behavior: 'smooth'});
+  const ac = $('#acuan'); ac.className = 'acuan'; ac.textContent = 'Mencari ground truth...';
+  st.textContent = 'Mencari ground truth...';
+
+  const gt = await post('/api/gt', {message: q});
+  if (gt.error) {
+    ac.className = 'acuan kosong'; ac.textContent = gt.error;
+    tombol.disabled = false; tombol.textContent = 'Bandingkan'; st.textContent = ''; return;
+  }
+  if (gt.ada) {
+    ac.innerHTML = `<b>Ground truth:</b> ${esc(gt.ground_truth)}<small>Cocok dengan pertanyaan dataset: ${esc(gt.pertanyaan_dataset)} (${esc(gt.destinasi)}, dokumentasi ${esc(gt.kategori)})</small>`;
+  } else {
+    ac.className = 'acuan kosong';
+    ac.innerHTML = '<b>Pertanyaan ini tidak ada di dataset.</b><small>Model tetap menjawab, tetapi skor tidak dihitung.</small>';
+  }
+
+  gt.model.forEach((nama, i) => {
+    $('#grid').insertAdjacentHTML('beforeend',
+      `<div class="kartu" id="k${i}" style="--w:${WARNA[i % 4]}"><div class="kepala"><div class="inisial">${esc(nama[0])}</div><h3>${esc(nama)}</h3></div><div class="jawab tunggu">Menunggu giliran...</div></div>`);
+  });
+
+  const hasil = [];
+  for (let i = 0; i < gt.model.length; i++) {
+    st.textContent = `Model ${i + 1} dari ${gt.model.length} sedang menjawab (di CPU bisa 1 sampai 3 menit)...`;
+    $('#k' + i + ' .jawab').textContent = 'Sedang menjawab...';
+    try {
+      const r = await post('/api/jawab', {message: q, model: i});
+      hasil.push({nama: gt.model[i], skor: r.skor, i: i});
+      isiKartu(i, r);
+    } catch (e) {
+      isiKartu(i, {error: 'Server tidak merespons. Periksa terminal Flask dan Ollama.', detik: 0});
+    }
+  }
+
+  const urut = hasil.filter(h => h.skor != null).sort((a, b) => b.skor - a.skor);
+  if (urut.length) {
+    $('#k' + urut[0].i + ' .kepala').insertAdjacentHTML('beforeend', '<span class="lencana">Paling mirip acuan</span>');
+    const p = $('#peringkat');
+    p.innerHTML = '<h3>Peringkat skor</h3>' + urut.map((h, n) =>
+      `<div class="baris" style="--w:${WARNA[h.i % 4]}"><div class="no">${n + 1}</div><div><b>${esc(h.nama)}</b></div><div class="bar"><i style="width:0" data-w="${Math.max(0, h.skor) * 100}"></i></div><b>${h.skor.toFixed(3)}</b></div>`).join('')
+      + '<div class="catatan">Skor mengukur kemiripan makna dengan ground truth, bukan kebenaran fakta. Jawaban yang keliru masih bisa berskor menengah.</div>';
+    p.style.display = 'block';
+    setTimeout(() => p.querySelectorAll('.bar i').forEach(b => b.style.width = b.dataset.w + '%'), 60);
+  }
+  st.textContent = 'Selesai. Gulir ke bawah untuk melihat peringkat.';
+  tombol.disabled = false; tombol.textContent = 'Bandingkan';
+}
+
+$('#q').addEventListener('keydown', e => { if (e.key === 'Enter') bandingkan(); });
+</script>
+</body>
+</html>
